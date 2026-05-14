@@ -11,6 +11,10 @@
 - `npx clasp login`
 - `npx clasp clone スクリプトID`
 
+## 参考
+
+- https://developers.google.com/apps-script/guides/docs?hl=ja
+
 ## 済
 
 - build上手くいかない
