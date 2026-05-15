@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>日付選択</h2>
+
+    <input type="date" id="dateInput" />
+
+    <br /><br />
+
+    <button onclick="execute()">実行</button>
+
+    <div>
+      <select id="templateSelect">
+        <option>読み込み中...</option>
+      </select>
+    </div>
+
+    <div>
+      <button onclick="insert()">挿入</button>
+    </div>
+
+    <script>
+      // 実行
+      function execute() {
+        const input = document.getElementById("dateInput");
+
+        const dateStr = input.value;
+
+        google.script.run
+          .withSuccessHandler(showEvents)
+          .getDateEventItems(dateStr);
+      }
+
+      function showEvents(events) {
+        const select = document.getElementById("templateSelect");
+
+        select.innerHTML = "";
+
+        events.forEach((event) => {
+          const option = document.createElement("option");
+
+          option.value = event.id;
+          option.textContent = event.title;
+
+          select.appendChild(option);
+        });
+      }
+
+      function insert() {
+        const select = document.getElementById("templateSelect");
+
+        const eventId = select.value;
+
+        google.script.run
+          .withSuccessHandler(() => {
+            google.script.host.close();
+          })
+          .insertEvent(eventId);
+      }
+    </script>
+  </body>
+</html>

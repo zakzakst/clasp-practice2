@@ -1,5 +1,8 @@
 import { menuInit_ } from "./utils/document/menuInit";
 import { showAlert_ } from "./utils/document/showAlert";
+import { showDialog_ } from "./utils/common/showDialog";
+import { copyTabContent_ } from "./utils/document/copyTabContent";
+import { getDateEventItems_ } from "./utils/calendar/getDateEvents";
 
 type TabItem = {
   id: string;
@@ -27,73 +30,39 @@ const getTemplateTabItems = (): TabItem[] | undefined => {
   return childTabItems;
 };
 
-// const insertTemplate_ = (id: string) => {
-//   showAlert_(JSON.stringify(id || "ID指定なし"));
-// };
-
 const showInsertTemplateDialog_ = () => {
-  const html = HtmlService.createHtmlOutputFromFile("dialog")
-    .setWidth(400)
-    .setHeight(300);
-
-  DocumentApp.getUi().showModalDialog(html, "テンプレート選択");
-};
-
-const copyTabContent = (sourceTabId: string) => {
-  const document = DocumentApp.getActiveDocument();
-
-  const sourceBody = document.getTab(sourceTabId).asDocumentTab().getBody();
-
-  const targetBody = document.getActiveTab().asDocumentTab().getBody();
-  const numChildren = sourceBody.getNumChildren();
-
-  for (let i = 0; i < numChildren; i++) {
-    const element = sourceBody.getChild(i).copy();
-
-    const type = element.getType();
-
-    switch (type) {
-      case DocumentApp.ElementType.PARAGRAPH:
-        targetBody.appendParagraph(element);
-        break;
-
-      case DocumentApp.ElementType.LIST_ITEM:
-        targetBody.appendListItem(element);
-        break;
-
-      case DocumentApp.ElementType.TABLE:
-        targetBody.appendTable(element);
-        break;
-    }
-  }
+  showDialog_("dialog", "テンプレート選択");
 };
 
 const insertTemplate = (id: string) => {
-  // showAlert_(JSON.stringify(id || "ID指定なし"));
-  copyTabContent(id);
+  copyTabContent_(id);
+};
+
+// TODO: IDからカレンダー情報を取得する
+const showSelectDateDialog_ = () => {
+  showDialog_("selectDate", "日付選択");
+};
+
+const getDateEventItems = (dateStr: string) => {
+  const events = getDateEventItems_(dateStr);
+  return events;
+};
+
+const insertEvent = (eventId: string) => {
+  const calendar = CalendarApp.getDefaultCalendar();
+  const event = calendar.getEventById(eventId);
+  showAlert_(event.getTitle());
 };
 
 const onOpen = () => {
-  // メニューの関数に直接引数を渡すことはできない
-  // const templateItems = getTemplateTabItems_();
-
-  // if (!templateItems) {
-  //   return;
-  // }
-
-  // const menuItems: MenuItem[] = templateItems.map((item) => {
-  //   return {
-  //     label: `${item.title}挿入`,
-  //     name: `insertTemplate_(${item.id})`,
-  //   };
-  // });
-
-  // menuInit_(menuItems);
-
   menuInit_([
     {
       label: "テンプレート挿入",
       name: "showInsertTemplateDialog_",
+    },
+    {
+      label: "カレンダー情報取得",
+      name: "showSelectDateDialog_",
     },
   ]);
 };
