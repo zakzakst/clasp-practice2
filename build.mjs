@@ -19,9 +19,10 @@ await esbuild.build({
   minifyWhitespace: true,
 });
 
-// try {
-//   await fs.cp("src/html", "dist", { recursive: true });
-//   console.log("HTML files copied successfully to dist/html");
-// } catch (error) {
-//   console.error("Error copying HTML files:", error);
-// }
+// TODO: htmlファイルのみコピーする。gitkeepがあるとき、distに入ってしまう
+try {
+  await fs.cp("src/html", "dist", { recursive: true });
+  console.log("HTML files copied successfully to dist/html");
+} catch (error) {
+  console.error("Error copying HTML files:", error);
+}

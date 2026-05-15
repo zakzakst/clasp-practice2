@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>テンプレート選択</h2>
+
+    <select id="templateSelect">
+      <option>読み込み中...</option>
+    </select>
+
+    <br /><br />
+
+    <button onclick="execute()">実行</button>
+
+    <script>
+      // 初期表示時
+      google.script.run.withSuccessHandler(renderTabs).getTemplateTabItems();
+
+      // select生成
+      function renderTabs(tabs) {
+        const select = document.getElementById("templateSelect");
+
+        select.innerHTML = "";
+
+        tabs.forEach((tab) => {
+          const option = document.createElement("option");
+
+          option.value = tab.id;
+          option.textContent = tab.title;
+
+          select.appendChild(option);
+        });
+      }
+
+      // 実行
+      function execute() {
+        const select = document.getElementById("templateSelect");
+
+        const tabId = select.value;
+
+        google.script.run
+          .withSuccessHandler(() => {
+            google.script.host.close();
+          })
+          .insertTemplate(tabId);
+      }
+    </script>
+  </body>
+</html>

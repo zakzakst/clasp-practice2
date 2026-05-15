@@ -1,79 +1,69 @@
 import { menuInit_ } from "./utils/document/menuInit";
+import { showAlert_ } from "./utils/document/showAlert";
 
-const helloDocument = () => {
-  DocumentApp.getActiveDocument().getBody().appendParagraph("こんにちは GAS!");
+type TabItem = {
+  id: string;
+  title: string;
 };
 
-const createStyledDocument = () => {
-  const body = DocumentApp.getActiveDocument().getBody();
+const getTemplateTabItems = (): TabItem[] | undefined => {
+  const tabs = DocumentApp.getActiveDocument().getTabs();
+  const templateTab = tabs.find((tab) => tab.getTitle() === "テンプレート");
 
-  // タイトル
-  const title = body.appendParagraph("GASハンズオン");
+  if (!templateTab) {
+    showAlert_("「テンプレート」タブが見つかりませんでした");
+    return;
+  }
 
-  title.setHeading(DocumentApp.ParagraphHeading.TITLE);
+  const childTabItems: TabItem[] = templateTab
+    .getChildTabs()
+    .map((childTab) => {
+      return {
+        id: childTab.getId(),
+        title: childTab.getTitle(),
+      };
+    });
 
-  // 見出し
-  const heading = body.appendParagraph("■ 今日の学習内容");
-
-  heading.setHeading(DocumentApp.ParagraphHeading.HEADING1);
-
-  // 本文
-  body.appendParagraph("GoogleドキュメントをGASで操作する");
-
-  // 強調テキスト
-  const important = body.appendParagraph("重要ポイント");
-
-  // NOTE: typescriptエラー出るが挙動には問題ない。一旦そのまま（@types/google-apps-scriptの関係？）
-  important.setBold(true).setForegroundColor("#ff0000");
+  return childTabItems;
 };
 
-const updateTodayTab = () => {
-  const document = DocumentApp.getActiveDocument();
+// const insertTemplate_ = (id: string) => {
+//   showAlert_(JSON.stringify(id || "ID指定なし"));
+// };
 
-  // タブIDを入力
-  // const tabId = "ここにタブID";
+const showInsertTemplateDialog_ = () => {
+  const html = HtmlService.createHtmlOutputFromFile("dialog")
+    .setWidth(400)
+    .setHeight(300);
 
-  // タブ取得
-  // const tab = document.getTab(tabId);
-  const tab = document.getActiveTab();
+  DocumentApp.getUi().showModalDialog(html, "テンプレート選択");
+};
 
-  // DocumentTabへ変換
-  const documentTab = tab.asDocumentTab();
-
-  // 今日の日付
-  const today = new Date();
-
-  // タブ名用
-  const tabTitle = Utilities.formatDate(
-    today,
-    Session.getScriptTimeZone(),
-    "yyyyMMdd",
-  );
-
-  // 表示タイトル用
-  const displayTitle = Utilities.formatDate(
-    today,
-    Session.getScriptTimeZone(),
-    "yyyy/MM/dd",
-  );
-
-  // タブ名変更
-  // tab.setTitle(tabTitle);
-
-  // 本文取得
-  const body = documentTab.getBody();
-
-  // タイトル追加
-  const title = body.appendParagraph(displayTitle);
-
-  title.setHeading(DocumentApp.ParagraphHeading.TITLE);
+const insertTemplate = (id: string) => {
+  showAlert_(JSON.stringify(id || "ID指定なし"));
 };
 
 const onOpen = () => {
+  // メニューの関数に直接引数を渡すことはできない
+  // const templateItems = getTemplateTabItems_();
+
+  // if (!templateItems) {
+  //   return;
+  // }
+
+  // const menuItems: MenuItem[] = templateItems.map((item) => {
+  //   return {
+  //     label: `${item.title}挿入`,
+  //     name: `insertTemplate_(${item.id})`,
+  //   };
+  // });
+
+  // menuInit_(menuItems);
+
   menuInit_([
     {
       label: "テンプレート挿入",
-      name: "updateTodayTab",
+      name: "showInsertTemplateDialog_",
     },
   ]);
 };
