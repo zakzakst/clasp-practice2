@@ -33,3 +33,13 @@ const test = () => {
   Logger.log(events[0].getId());
   Logger.log(events[0].getTitle());
 };
+
+function replaceInTab() {
+  const document = DocumentApp.getActiveDocument();
+
+  const tab = document.getTab("タブID").asDocumentTab();
+
+  const body = tab.getBody();
+
+  body.replaceText("{{date}}", "2026/05/15");
+}
